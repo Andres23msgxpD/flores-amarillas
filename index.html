@@ -11,15 +11,21 @@
       background-color: #050508;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex; justify-content: center; align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    canvas {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
     #bgCanvas { z-index: 1; }
     #flowerCanvas { z-index: 2; }
     #fxCanvas { z-index: 3; }
     #start-screen {
-      position: absolute; z-index: 10;
+      position: absolute; z-index: 9999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; transition: opacity 0.6s ease;
+      cursor: pointer; transition: opacity 0.5s ease;
+      touch-action: manipulation;
     }
     .hud-box {
       width: 170px; height: 170px;
@@ -29,6 +35,7 @@
       background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 70%);
       box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
       border-radius: 12px;
+      pointer-events: auto;
     }
     .hud-box::before, .hud-box::after {
       content: ''; position: absolute; width: 16px; height: 16px;
@@ -51,15 +58,18 @@
   <audio id="bgm" preload="auto">
     <source src="music.mp3" type="audio/mpeg">
   </audio>
-  <div id="start-screen" onclick="startExperience()">
+
+  <div id="start-screen">
     <div class="hud-box">
       <div class="icon">🌻</div>
       <div class="start-text">TOCA AQUÍ</div>
     </div>
   </div>
+
   <canvas id="bgCanvas"></canvas>
   <canvas id="flowerCanvas"></canvas>
   <canvas id="fxCanvas"></canvas>
+
   <script>
     const bgCanvas = document.getElementById("bgCanvas");
     const flowerCanvas = document.getElementById("flowerCanvas");
@@ -69,6 +79,7 @@
     const fxCtx = fxCanvas.getContext("2d");
     const bgm = document.getElementById("bgm");
     let width, height;
+
     function resize() {
       width = bgCanvas.width = flowerCanvas.width = fxCanvas.width = window.innerWidth;
       height = bgCanvas.height = flowerCanvas.height = fxCanvas.height = window.innerHeight;
@@ -77,9 +88,11 @@
     }
     window.addEventListener("resize", resize);
     resize();
+
     let started = false;
     let progress = 0;
     const points = [];
+
     function generateSunflowerPoints() {
       const cx = width / 2;
       const cy = height / 2 - 30;
@@ -111,6 +124,7 @@
         points.push({ x: cx + rad * Math.cos(angle), y: cy + rad * Math.sin(angle), color: '#ff9900', r: 1.6 });
       }
     }
+
     const sparkles = Array.from({ length: 45 }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
@@ -118,6 +132,7 @@
       size: 1 + Math.random() * 1.5,
       alpha: 0.2 + Math.random() * 0.6
     }));
+
     function loop() {
       bgCtx.fillStyle = "rgba(5, 5, 8, 0.25)";
       bgCtx.fillRect(0, 0, width, height);
@@ -150,17 +165,28 @@
       }
       requestAnimationFrame(loop);
     }
-    function startExperience() {
+
+    function startExperience(e) {
+      if (e) e.preventDefault();
+      if (started) return;
+      started = true;
+
       if (bgm) {
         bgm.currentTime = 0;
-        bgm.play().catch(e => console.error(e));
+        bgm.play().catch(err => console.error(err));
       }
+
       const scr = document.getElementById("start-screen");
       scr.style.opacity = "0";
-      setTimeout(() => { scr.style.display = "none"; }, 600);
+      setTimeout(() => { scr.style.display = "none"; }, 500);
+
       generateSunflowerPoints();
-      started = true;
     }
+
+    const startBtn = document.getElementById("start-screen");
+    startBtn.addEventListener("click", startExperience);
+    startBtn.addEventListener("touchstart", startExperience, { passive: false });
+
     loop();
   </script>
 </body>
