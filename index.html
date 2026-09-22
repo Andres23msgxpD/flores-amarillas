@@ -81,30 +81,6 @@
       text-transform: uppercase;
       text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
     }
-    #center-message {
-      position: absolute;
-      z-index: 5;
-      text-align: center;
-      color: #fff;
-      opacity: 0;
-      transform: scale(0.85);
-      transition: opacity 1.5s ease, transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      pointer-events: none;
-    }
-    #center-message h1 {
-      font-size: 2.2rem;
-      letter-spacing: 5px;
-      color: #fffbdf;
-      text-shadow: 0 0 10px #ffd700, 0 0 25px #ffaa00, 0 0 45px #ff8800;
-      margin-bottom: 8px;
-    }
-    #center-message p {
-      font-size: 0.9rem;
-      letter-spacing: 3px;
-      color: #ffe680;
-      text-transform: uppercase;
-      text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
-    }
     @keyframes pulse {
       0% { transform: scale(0.95); opacity: 0.7; }
       100% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 18px #ffd700); }
@@ -113,9 +89,9 @@
 </head>
 <body>
 
-  <!-- Audio online directo -->
+  <!-- Audio local garantizado -->
   <audio id="bgm" preload="auto">
-    <source src="https://raw.githubusercontent.com/Lyg0327/Music/main/golden-hour.mp3" type="audio/mpeg">
+    <source src="music.mp3" type="audio/mpeg">
   </audio>
 
   <div id="start-screen" onclick="startExperience()">
@@ -123,11 +99,6 @@
       <div class="icon">🌻</div>
       <div class="start-text">TOCA AQUÍ</div>
     </div>
-  </div>
-
-  <div id="center-message">
-    <h1>FLORES AMARILLAS</h1>
-    <p>Para ti en este día especial</p>
   </div>
 
   <canvas id="canvas"></canvas>
@@ -154,7 +125,7 @@
       const centerY = height / 2 - 30;
       const baseScale = Math.min(width, height) * 0.35;
 
-      // Tallo y hoja
+      // 1. Tallo y hoja
       for (let t = 0; t <= 1; t += 0.005) {
         let x = centerX + Math.sin(t * Math.PI) * 20;
         let y = centerY + baseScale * 0.4 + t * (height * 0.45);
@@ -167,7 +138,7 @@
         points.push({ x: lx, y: ly, color: '#00ff66', size: 1.5 });
       }
 
-      // Pétalos
+      // 2. Pétalos del Girasol
       const numPetals = 16;
       for (let a = 0; a < Math.PI * 2; a += 0.005) {
         let r = baseScale * (0.65 + 0.38 * Math.cos(numPetals * a));
@@ -183,7 +154,7 @@
         points.push({ x, y, color: '#ffa500', size: 1.8 });
       }
 
-      // Centro / Semillas
+      // 3. Semillas de la flor
       const phi = 1.61803398875;
       const totalSeeds = 350;
       for (let i = 0; i < totalSeeds; i++) {
@@ -246,10 +217,6 @@
           ctx.fill();
           
           progress += 7;
-        } else {
-          const msg = document.getElementById("center-message");
-          msg.style.opacity = "1";
-          msg.style.transform = "scale(1)";
         }
       }
 
@@ -259,7 +226,7 @@
     function startExperience() {
       if (bgm) {
         bgm.currentTime = 0;
-        bgm.play().catch(e => console.log("Audio waiting for user gesture:", e));
+        bgm.play().catch(e => console.error("Error reproduciendo audio:", e));
       }
 
       document.getElementById("start-screen").style.opacity = "0";
