@@ -113,9 +113,9 @@
 </head>
 <body>
 
-  <!-- Audio de fondo -->
+  <!-- Audio online directo -->
   <audio id="bgm" preload="auto">
-    <source src="music.mp3" type="audio/mpeg">
+    <source src="https://raw.githubusercontent.com/Lyg0327/Music/main/golden-hour.mp3" type="audio/mpeg">
   </audio>
 
   <div id="start-screen" onclick="startExperience()">
@@ -154,7 +154,7 @@
       const centerY = height / 2 - 30;
       const baseScale = Math.min(width, height) * 0.35;
 
-      // 1. Tallo y hoja
+      // Tallo y hoja
       for (let t = 0; t <= 1; t += 0.005) {
         let x = centerX + Math.sin(t * Math.PI) * 20;
         let y = centerY + baseScale * 0.4 + t * (height * 0.45);
@@ -167,7 +167,7 @@
         points.push({ x: lx, y: ly, color: '#00ff66', size: 1.5 });
       }
 
-      // 2. Pétalos del Girasol
+      // Pétalos
       const numPetals = 16;
       for (let a = 0; a < Math.PI * 2; a += 0.005) {
         let r = baseScale * (0.65 + 0.38 * Math.cos(numPetals * a));
@@ -183,7 +183,7 @@
         points.push({ x, y, color: '#ffa500', size: 1.8 });
       }
 
-      // 3. Semillas de la flor
+      // Centro / Semillas
       const phi = 1.61803398875;
       const totalSeeds = 350;
       for (let i = 0; i < totalSeeds; i++) {
@@ -257,7 +257,6 @@
     }
 
     function startExperience() {
-      // Reproducir audio tras la interacción del usuario
       if (bgm) {
         bgm.currentTime = 0;
         bgm.play().catch(e => console.log("Audio waiting for user gesture:", e));
