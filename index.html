@@ -49,8 +49,10 @@
   </style>
 </head>
 <body>
-  <audio id="bgm" preload="auto">
+  <!-- Audio local con respaldo remoto -->
+  <audio id="bgm" preload="auto" playsinline>
     <source src="music.mp3" type="audio/mpeg">
+    <source src="https://ia801503.us.archive.org/15/items/jvke-golden-hour-official-music-video/JVKE%20-%20golden%20hour%20%28Official%20Music%20Video%29.mp3" type="audio/mpeg">
   </audio>
 
   <div id="start-screen">
@@ -93,35 +95,40 @@
       const cy = height / 2 - 20;
       const scale = Math.min(width, height) * 0.35;
 
-      for (let t = 0; t <= 1; t += 0.006) {
+      // 1. Tallo fluido
+      for (let t = 0; t <= 1; t += 0.003) {
         let x = cx + Math.sin(t * Math.PI) * 20;
         let y = cy + scale * 0.4 + t * (height * 0.42);
         points.push({ x: x, y: y, color: "#39ff14", r: 1.8 });
       }
 
-      for (let a = 0; a <= Math.PI * 2; a += 0.06) {
+      // 2. Hoja
+      for (let a = 0; a <= Math.PI * 2; a += 0.03) {
         let lx = cx + 15 + Math.cos(a) * 45;
         let ly = cy + scale * 0.8 + Math.sin(a) * 18;
         points.push({ x: lx, y: ly, color: "#00ff66", r: 1.5 });
       }
 
+      // 3. Pétalos exteriores
       const petals = 16;
-      for (let a = 0; a < Math.PI * 2; a += 0.008) {
+      for (let a = 0; a < Math.PI * 2; a += 0.004) {
         let r = scale * (0.65 + 0.38 * Math.cos(petals * a));
-        points.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a), color: "#ffea00", r: 2.2 });
+        points.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a), color: "#ffea00", r: 2.0 });
       }
 
-      for (let a = 0; a < Math.PI * 2; a += 0.012) {
+      // 4. Pétalos interiores
+      for (let a = 0; a < Math.PI * 2; a += 0.006) {
         let r = (scale * 0.72) * (0.65 + 0.38 * Math.cos(petals * a + 0.2));
-        points.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a), color: "#ffa500", r: 1.8 });
+        points.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a), color: "#ffa500", r: 1.7 });
       }
 
+      // 5. Semillas
       const phi = 1.61803398875;
-      const totalSeeds = 280;
+      const totalSeeds = 320;
       for (let i = 0; i < totalSeeds; i++) {
         let angle = i * 2 * Math.PI * phi;
         let rad = Math.sqrt(i) / Math.sqrt(totalSeeds) * (scale * 0.38);
-        points.push({ x: cx + rad * Math.cos(angle), y: cy + rad * Math.sin(angle), color: "#ff9900", r: 1.6 });
+        points.push({ x: cx + rad * Math.cos(angle), y: cy + rad * Math.sin(angle), color: "#ff9900", r: 1.5 });
       }
     }
 
@@ -152,7 +159,8 @@
         fxCtx.clearRect(0, 0, width, height);
 
         if (progress < points.length) {
-          const batch = 12;
+          // Velocidad calibrada: 3 puntos por frame para un trazo pausado
+          const batch = 3;
           const limit = Math.min(progress + batch, points.length);
 
           for (let i = progress; i < limit; i++) {
@@ -184,9 +192,16 @@
       if (started) return;
       started = true;
 
+      // Reproducción inmediata dentro del toque de usuario
       if (bgm) {
+        bgm.volume = 1.0;
         bgm.currentTime = 0;
-        bgm.play().catch(function(err) { console.error(err); });
+        const playPromise = bgm.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(function(err) {
+            console.warn("Audio autoplay policy check:", err);
+          });
+        }
       }
 
       startBtn.style.opacity = "0";
